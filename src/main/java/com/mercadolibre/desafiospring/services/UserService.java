@@ -1,14 +1,17 @@
 package com.mercadolibre.desafiospring.services;
 
+import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
-import com.mercadolibre.desafiospring.requests.CreateUserRequest;
+import com.mercadolibre.desafiospring.requests.UserRequest;
 
 public interface UserService {
-    int create(CreateUserRequest createUserRequest);
+    User create(UserRequest userRequest);
 
     void follow(Integer userId, Integer userIdToFollow);
 
     User update(User user);
 
-    User getFollowers(Integer userId);
+    Seller getSeller(Integer userId);
+
+    User getUser(Integer userId);
 }

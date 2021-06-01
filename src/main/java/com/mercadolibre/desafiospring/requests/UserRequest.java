@@ -4,17 +4,17 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
-public class CreateUserRequest {
+public class UserRequest {
 
     @NotBlank(message = "Preenchimento obrigatório")
     @Size(min=5,max=20,message = "Nome de usuário deve ter entre 5 e 20 caracteres")
     private String userName;
     private boolean seller;
 
-    public CreateUserRequest() {
+    public UserRequest() {
     }
 
-    public CreateUserRequest(String userName, boolean seller) {
+    public UserRequest(String userName, boolean seller) {
         this.userName = userName;
         this.seller = seller;
     }

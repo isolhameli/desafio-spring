@@ -1,6 +1,9 @@
 package com.mercadolibre.desafiospring.models;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,7 @@ import java.util.List;
 public class Seller extends User{
 
     @OneToMany(mappedBy = "seller")
-    private List<Product> productList;
+    private List<Post> postList;
 
 
     @ManyToMany(mappedBy = "followingList")
@@ -21,16 +24,16 @@ public class Seller extends User{
 
     public Seller(String userName, LocalDate joinDate) {
         super(userName, joinDate);
-        this.productList = new ArrayList();
+        this.postList = new ArrayList();
         this.followerList = new ArrayList();
     }
 
-    public List<Product> getProductList() {
-        return productList;
+    public List<Post> getPostList() {
+        return postList;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setPostList(List<Post> postList) {
+        this.postList = postList;
     }
 
     public List<User> getFollowerList() {

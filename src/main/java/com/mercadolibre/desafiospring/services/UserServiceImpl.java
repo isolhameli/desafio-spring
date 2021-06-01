@@ -6,7 +6,7 @@ import com.mercadolibre.desafiospring.exceptions.user.UserTypeNotValidException;
 import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
 import com.mercadolibre.desafiospring.repositories.UserRepository;
-import com.mercadolibre.desafiospring.requests.CreateUserRequest;
+import com.mercadolibre.desafiospring.requests.UserRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,15 +25,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public int create(CreateUserRequest createUserRequest) {
+    public User create(UserRequest userRequest) {
         User user;
-        if (createUserRequest.isSeller()){
-            user = new Seller(createUserRequest.getUserName(), LocalDate.now());
+        if (userRequest.isSeller()){
+            user = new Seller(userRequest.getUserName(), LocalDate.now());
         }
         else{
-            user = new User(createUserRequest.getUserName(), LocalDate.now());
+            user = new User(userRequest.getUserName(), LocalDate.now());
         }
-        return userRepository.save(user).getId();
+        return userRepository.save(user);
     }
 
     @Override
@@ -55,16 +55,25 @@ public class UserServiceImpl implements UserService{
         return userRepository.saveAndFlush(user);
     }
 
+    public <T extends User> T getEntity(Class T, Integer userId, String classeErrada){
+        User user = getUser(userId);
+        if (user.getClass() != T){
+            throw new UserTypeNotValidException("Usuário "+userId+ " não é um "+ classeErrada);
+        }
+        return (T) user;
+    }
+
     @Override
-    public User getFollowers(Integer userId) {
-        User user = findById(userId);
+    public Seller getSeller(Integer userId) {
+        User user = getUser(userId);
         if (user.getClass() != Seller.class){
             throw new UserTypeNotValidException("Usuário "+userId+ " não é um Vendedor");
         }
-        return user;
+        return (Seller) user;
     }
 
-    private User findById(Integer userId){
+    @Override
+    public User getUser(Integer userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado. ID: "+userId));
     }
 

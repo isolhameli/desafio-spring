@@ -1,45 +1,25 @@
-package com.mercadolibre.desafiospring.models;
+package com.mercadolibre.desafiospring.requests;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
-@Entity
-public class Product {
+public class ProductRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @NotBlank(message = "Campo não pode ser nulo")
+    @NotBlank
     private String productName;
-
     private String type;
     private String brand;
     private String color;
     private String notes;
 
-
-    public Product() {
+    public ProductRequest() {
     }
 
-    public Product(Integer id, String productName, String type, String brand, String color, String notes) {
-        this.id = id;
+    public ProductRequest(String productName, String type, String brand, String color, String notes) {
         this.productName = productName;
         this.type = type;
         this.brand = brand;
         this.color = color;
         this.notes = notes;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getProductName() {
