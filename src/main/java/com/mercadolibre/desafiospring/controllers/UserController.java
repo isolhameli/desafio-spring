@@ -4,7 +4,7 @@ package com.mercadolibre.desafiospring.controllers;
 import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
 import com.mercadolibre.desafiospring.requests.UserRequest;
-import com.mercadolibre.desafiospring.responses.*;
+import com.mercadolibre.desafiospring.responses.users.*;
 import com.mercadolibre.desafiospring.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,28 +45,28 @@ public class UserController {
     ResponseEntity<SellerFollowersCount> getFollowersCount(@PathVariable Integer userId) {
 
         Seller user = (Seller) userService.getSeller(userId);
-        SellerFollowersCount sellerFollowersCount = new SellerFollowersCount(userId, user.getUserName(), user.getFollowerCount());
+        Integer followerCount = userService.getFollowerCount(userId);
+        SellerFollowersCount sellerFollowersCount = new SellerFollowersCount(userId, user.getUserName(), followerCount);
         return ResponseEntity.ok(sellerFollowersCount);
     }
 
+
     @GetMapping(value = "/{userId}/followers/list")
-    ResponseEntity<FollowList> getFollowersList(@PathVariable Integer userId){
-        Seller seller = userService.getSeller(userId);
-        List<UserResponse> usuarioResponseList= seller.getFollowerList().stream().
-                map(el -> new UserResponse(el.getId(),el.getUserName()))
-                .collect(Collectors.toList());
-            FollowList followList = new FollowerList(userId,seller.getUserName(),usuarioResponseList);
-            return ResponseEntity.ok(followList);
+    ResponseEntity<FollowList> getFollowedList(@PathVariable Integer userId, @RequestParam(defaultValue = "asc") String order){
+        FollowList followList = userService.getFollowers(userId, order);
+        return ResponseEntity.ok(followList);
     }
 
     @GetMapping(value = "/{userId}/followed/list")
-    ResponseEntity<FollowList> getFollowedList(@PathVariable Integer userId){
-        User user = userService.getUser(userId);
-        List<UserResponse> usuarioResponseList = user.getFollowingList().stream().
-                map(el -> new UserResponse(el.getId(),el.getUserName()))
-                .collect(Collectors.toList());
-        FollowList followList = new FollowedList(userId,user.getUserName(),usuarioResponseList);
+    ResponseEntity<FollowList> getFollowersList(@PathVariable Integer userId, @RequestParam(defaultValue = "asc") String order){
+        FollowList followList = userService.getFollowed(userId, order);
         return ResponseEntity.ok(followList);
+    }
+
+    @PostMapping(value = "/{userId}/unfollow/{userIdToUnfollow}")
+    ResponseEntity<FollowList> getFollowedList(@PathVariable Integer userId, @PathVariable Integer userIdToUnfollow){
+        userService.unfollow(userId, userIdToUnfollow);
+        return ResponseEntity.ok().build();
     }
 
 

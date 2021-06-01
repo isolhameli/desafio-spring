@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.responses;
+package com.mercadolibre.desafiospring.responses.users;
 
 import java.util.List;
 

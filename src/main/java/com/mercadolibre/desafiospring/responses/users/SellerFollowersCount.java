@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.responses;
+package com.mercadolibre.desafiospring.responses.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

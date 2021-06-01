@@ -1,12 +1,15 @@
 package com.mercadolibre.desafiospring.services;
 
-import com.mercadolibre.desafiospring.exceptions.user.UserAlreadyFollowsSellerException;
-import com.mercadolibre.desafiospring.exceptions.user.UserNotFoundException;
-import com.mercadolibre.desafiospring.exceptions.user.UserTypeNotValidException;
+import com.mercadolibre.desafiospring.exceptions.user.*;
 import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
+import com.mercadolibre.desafiospring.repositories.SellerRepository;
 import com.mercadolibre.desafiospring.repositories.UserRepository;
 import com.mercadolibre.desafiospring.requests.UserRequest;
+import com.mercadolibre.desafiospring.responses.users.FollowList;
+import com.mercadolibre.desafiospring.responses.users.FollowedList;
+import com.mercadolibre.desafiospring.responses.users.UserResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,9 +22,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, SellerRepository sellerRepository) {
         this.userRepository = userRepository;
+        this.sellerRepository = sellerRepository;
     }
 
     @Override
@@ -38,54 +43,51 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void follow(Integer userId, Integer userIdToFollow) {
-        List<User> users = findAllId(Arrays.asList(userId,userIdToFollow));
+        checkAndHandleSameUser(userId, userIdToFollow);
+        List<User> users = findAllById(Arrays.asList(userId,userIdToFollow));
         User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
         User userToFollow = users.stream().filter(el -> el.getId() == userIdToFollow).findFirst().get();
-        if (user.getFollowingList().contains(userToFollow)){
-            throw new UserAlreadyFollowsSellerException("Usuário já segue o Vendedor");
+        if (user.getFollowing().contains(userToFollow)){
+            throw new UserAlreadyFollowsSellerException("User already followers Seller");
         }
-        user.getFollowingList().add((Seller) userToFollow);
-        user = update(user);
-        int i = 0;
+        user.getFollowing().add((Seller) userToFollow);
+        update(user);
 
     }
 
     @Override
     public User update(User user) {
-        return userRepository.saveAndFlush(user);
-    }
-
-    public <T extends User> T getEntity(Class T, Integer userId, String classeErrada){
-        User user = getUser(userId);
-        if (user.getClass() != T){
-            throw new UserTypeNotValidException("Usuário "+userId+ " não é um "+ classeErrada);
-        }
-        return (T) user;
+        return userRepository.save(user);
     }
 
     @Override
     public Seller getSeller(Integer userId) {
         User user = getUser(userId);
         if (user.getClass() != Seller.class){
-            throw new UserTypeNotValidException("Usuário "+userId+ " não é um Vendedor");
+            throw new UserTypeNotValidException("User "+userId+ " is not a Seller");
         }
         return (Seller) user;
     }
 
     @Override
-    public User getUser(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado. ID: "+userId));
+    public Integer getFollowerCount(Integer userId) {
+        return userRepository.countFollowers(userId);
     }
 
-    private List<User> findAllId(List<Integer> idList){
+    @Override
+    public User getUser(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found. ID: "+userId));
+    }
+
+    private List<User> findAllById(List<Integer> idList){
         List<User> userList = userRepository.findAllById(idList);
         if (userList.size() == idList.size()){
             if (userList.stream().filter(elem -> elem.getId() == idList.get(1)).findFirst().get().getClass() != Seller.class){
-                throw new UserTypeNotValidException("Usuário "+idList.get(1)+ " não é um Vendedor");
+                throw new UserTypeNotValidException("User "+idList.get(1)+ " is not a Seller");
             };
             return userList;
         }
-        String error = "ID dos Usuários não encontrados: ";
+        String error = "User IDs not found: ";
         List<Integer> idsFound = userList.stream().map(User::getId).collect(Collectors.toList());
         List<Integer> idsNotFound = new ArrayList<>();
         for (Integer id: idList){
@@ -95,6 +97,65 @@ public class UserServiceImpl implements UserService{
         }
         error = error.substring(0,error.length()-2);
         throw new UserNotFoundException(error);
+
+    }
+
+    public boolean checkUserExistence(Integer userId){
+        return userRepository.existsById(userId);
+    }
+
+    @Override
+    public void unfollow(Integer userId, Integer userIdToUnfollow) {
+        checkAndHandleSameUser(userId, userIdToUnfollow);
+        List<User> users = findAllById(Arrays.asList(userId, userIdToUnfollow));
+        User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
+        Seller userToUnfollow = (Seller) users.stream().filter(el -> el.getId() == userIdToUnfollow).findFirst().get();
+        if (!user.removeFollowing(userToUnfollow)){
+            throw new UserDoesNotFollowSellerException("User does not follow seller");
+        };
+        userRepository.save(user);
+    }
+
+    @Override
+    public FollowedList getFollowers(Integer userId, String order) {
+        Seller seller = getSeller(userId);
+        order = order.toLowerCase();
+        List<User> followers = new ArrayList<>();
+        if (order.equals("desc")){
+            followers = userRepository.findByFollowingIdOrderByUserNameDesc(userId);
+        } else if(order.equals("asc")){
+            followers = userRepository.findByFollowingIdOrderByUserNameAsc(userId);
+        }
+        List<UserResponse> followersResponse = followers.stream().map(el -> UserResponse.fromModel(el))
+                .collect(Collectors.toList());
+        return new FollowedList(userId,seller.getUserName(),followersResponse);
+    }
+
+    @Override
+    public FollowList getFollowed(Integer userId, String order) {
+        User user = getUser(userId);
+        order = order.toLowerCase();
+        List<Seller> followed = new ArrayList<>();
+        if (order.equals("desc")){
+            followed = sellerRepository.findByFollowersIdOrderByUserNameDesc(userId);
+        } else if(order.equals("asc")){
+            followed = sellerRepository.findByFollowersIdOrderByUserNameAsc(userId);
+        }
+        List<UserResponse> followedResponse = followed.stream().
+                map(el -> new UserResponse(el.getId(),el.getUserName()))
+                .collect(Collectors.toList());
+        FollowList followList = new FollowedList(userId,user.getUserName(),followedResponse);
+        return followList;
+    }
+
+    private void checkAndHandleSameUser(Integer firstUser, Integer secondUser){
+        if (firstUser == secondUser){
+            if (!userRepository.existsById(firstUser)){
+                throw new UserNotFoundException("User not found. ID: "+firstUser);
+            }
+            throw new UserCycliclReferenceException("User cannot unfollow themself");
+        }
+
 
     }
 }

@@ -12,13 +12,13 @@ public class Post {
     private Integer id;
 
     @NotNull
-    private LocalDate localDate;
+    private LocalDate date;
 
     @ManyToOne
     private Seller seller;
 
     @OneToOne
-    private Product detail;
+    private Product product;
 
     @NotNull
     private Integer category;
@@ -29,11 +29,11 @@ public class Post {
     public Post() {
     }
 
-    public Post(Integer id, LocalDate localDate, Seller seller, Product detail, Integer category, Double price) {
+    public Post(Integer id, LocalDate date, Seller seller, Product product, Integer category, Double price) {
         this.id = id;
-        this.localDate = localDate;
+        this.date = date;
         this.seller = seller;
-        this.detail = detail;
+        this.product = product;
         this.category = category;
         this.price = price;
     }
@@ -46,12 +46,12 @@ public class Post {
         this.id = id;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setLocalDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public User getSeller() {
@@ -62,12 +62,12 @@ public class Post {
         this.seller = seller;
     }
 
-    public Product getDetail() {
-        return detail;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setDetail(Product detail) {
-        this.detail = detail;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public Integer getCategory() {

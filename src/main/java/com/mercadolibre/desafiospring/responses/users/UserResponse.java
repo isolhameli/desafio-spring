@@ -1,4 +1,6 @@
-package com.mercadolibre.desafiospring.responses;
+package com.mercadolibre.desafiospring.responses.users;
+
+import com.mercadolibre.desafiospring.models.User;
 
 public class UserResponse {
 
@@ -27,5 +29,9 @@ public class UserResponse {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public static UserResponse fromModel(User user){
+        return new UserResponse(user.getId(), user.getUserName());
     }
 }

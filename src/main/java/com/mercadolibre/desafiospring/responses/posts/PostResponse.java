@@ -1,25 +1,28 @@
-package com.mercadolibre.desafiospring.responses;
+package com.mercadolibre.desafiospring.responses.posts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.mercadolibre.desafiospring.models.Product;
+import com.mercadolibre.desafiospring.views.PostView;
 
 import java.time.LocalDate;
 
 @JsonPropertyOrder({"userId", "id","date", "detail", "category","price"})
 public class PostResponse {
 
+    @JsonView(PostView.Detailed.class)
     private Integer userId;
     private Integer id;
     private LocalDate date;
-    private Product detail;
+    private ProductResponse detail;
     private Integer category;
     private Double price;
 
     public PostResponse() {
     }
 
-    public PostResponse(Integer id, LocalDate date, Integer userId, Product detail, Integer category, Double price) {
+    public PostResponse(Integer id, LocalDate date, Integer userId, ProductResponse detail, Integer category, Double price) {
         this.id = id;
         this.date = date;
         this.userId = userId;
@@ -53,11 +56,11 @@ public class PostResponse {
         this.userId = userId;
     }
 
-    public Product getDetail() {
+    public ProductResponse getDetail() {
         return detail;
     }
 
-    public void setDetail(Product detail) {
+    public void setDetail(ProductResponse detail) {
         this.detail = detail;
     }
 
