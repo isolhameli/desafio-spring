@@ -1,23 +1,35 @@
 package com.mercadolibre.desafiospring.requests;
 
+import com.mercadolibre.desafiospring.models.Post;
+import com.mercadolibre.desafiospring.models.Product;
+import com.mercadolibre.desafiospring.models.Seller;
+import com.mercadolibre.desafiospring.validations.LocalDateCheck;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class PostRequest {
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+
     @NotNull(message = "Field cannot be null")
-    private Integer userId;
+    protected Integer userId;
     @NotNull(message = "Field cannot be null")
-    private ProductRequest detail;
+    @Valid
+    protected ProductRequest detail;
     @NotNull(message = "Field cannot be null")
-    private Integer category;
+    protected Integer category;
     @NotNull(message = "Field cannot be null")
-    private Double price;
-    private LocalDate date;
+    protected Double price;
+    @LocalDateCheck
+    protected String date;
 
     public PostRequest() {
     }
 
-    public PostRequest(Integer userId, ProductRequest detail, Integer category, Double price, LocalDate date) {
+    public PostRequest(Integer userId, ProductRequest detail, Integer category, Double price, String date) {
         this.userId = userId;
         this.detail = detail;
         this.category = category;
@@ -57,11 +69,19 @@ public class PostRequest {
         this.price = price;
     }
 
-    public LocalDate getDate() {
-        return date == null ? LocalDate.now() : date;
+    public String getDate() {
+
+        return date == null ? LocalDate.now().format(formatter) : date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(String date) {
         this.date = date;
+    }
+
+    public Post toModel(Seller seller, Product product){
+        LocalDate localDate = LocalDate.parse(this.date,
+                DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return new Post(null, localDate,seller,product,this.category,
+                this.price, false, null);
     }
 }

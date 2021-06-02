@@ -17,7 +17,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product create(ProductRequest productRequest) {
+    public Product save(ProductRequest productRequest) {
 
         Product product = new Product(null,productRequest.getProductName(),productRequest.getType(),
                 productRequest.getBrand(), productRequest.getColor(), productRequest.getNotes());

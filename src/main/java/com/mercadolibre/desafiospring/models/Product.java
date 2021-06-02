@@ -2,10 +2,7 @@ package com.mercadolibre.desafiospring.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -23,6 +20,9 @@ public class Product {
     private String color;
     private String notes;
 
+    @OneToOne(mappedBy = "product",cascade = CascadeType.REMOVE)
+    private Post post;
+
 
     public Product() {
     }
@@ -34,6 +34,7 @@ public class Product {
         this.brand = brand;
         this.color = color;
         this.notes = notes;
+        this.post = null;
     }
 
     public Integer getId() {

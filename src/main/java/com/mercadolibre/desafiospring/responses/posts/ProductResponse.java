@@ -17,13 +17,13 @@ public class ProductResponse {
     public ProductResponse() {
     }
 
-    public ProductResponse(Integer id, String productName, String type, String brand, String color, String notes) {
-        this.id = id;
-        this.productName = productName;
-        this.type = type;
-        this.brand = brand;
-        this.color = color;
-        this.notes = notes;
+    public ProductResponse(Product product){
+        this.id = product.getId();
+        this.productName = product.getProductName();
+        this.type = product.getType();
+        this.brand = product.getBrand();
+        this.color = product.getColor();
+        this.notes = product.getNotes();
     }
 
     @JsonProperty("product_id")
@@ -51,8 +51,4 @@ public class ProductResponse {
         return notes;
     }
 
-    public static ProductResponse fromEntity(Product product){
-        return new ProductResponse(product.getId(), product.getProductName(), product.getType(),
-                product.getBrand(), product.getColor(), product.getNotes());
-    }
 }

@@ -1,9 +1,10 @@
 package com.mercadolibre.desafiospring.responses.posts;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.mercadolibre.desafiospring.models.Product;
+import com.mercadolibre.desafiospring.models.Post;
 import com.mercadolibre.desafiospring.views.PostView;
 
 import java.time.LocalDate;
@@ -22,13 +23,13 @@ public class PostResponse {
     public PostResponse() {
     }
 
-    public PostResponse(Integer id, LocalDate date, Integer userId, ProductResponse detail, Integer category, Double price) {
-        this.id = id;
-        this.date = date;
-        this.userId = userId;
-        this.detail = detail;
-        this.category = category;
-        this.price = price;
+    public PostResponse(Post post){
+        this.id = post.getId();
+        this.date = post.getDate();
+        this.userId = post.getSeller().getId();
+        this.detail = new ProductResponse(post.getProduct());
+        this.category = post.getCategory();
+        this.price = post.getPrice();
     }
 
     @JsonProperty("id_post")
@@ -40,6 +41,7 @@ public class PostResponse {
         this.id = id;
     }
 
+    @JsonFormat(pattern = "dd-MM-uuuu")
     public LocalDate getDate() {
         return date;
     }

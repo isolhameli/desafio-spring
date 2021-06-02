@@ -3,7 +3,6 @@ package com.mercadolibre.desafiospring.models;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,10 +43,5 @@ public class Seller extends User{
 
     public void setFollowers(Set<User> followerList) {
         this.followers = followerList;
-    }
-
-    @Transient
-    public Integer getFollowerCount(){
-        return this.followers.size();
     }
 }

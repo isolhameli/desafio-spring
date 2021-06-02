@@ -1,6 +1,8 @@
 package com.mercadolibre.desafiospring.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -17,7 +19,7 @@ public class Post {
     @ManyToOne
     private Seller seller;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Product product;
 
     @NotNull
@@ -26,16 +28,25 @@ public class Post {
     @NotNull
     private Double price;
 
+    @NotNull
+    private Boolean hasPromo;
+
+    @DecimalMin(value = "0.0", message="Discount must be between 0 and 1")
+    @DecimalMax(value="1.0",message="Discount must be between 0 and 1")
+    private Double discount;
+
     public Post() {
     }
 
-    public Post(Integer id, LocalDate date, Seller seller, Product product, Integer category, Double price) {
+    public Post(Integer id, LocalDate date, Seller seller, Product product, Integer category, Double price, Boolean hasPromo, Double discount) {
         this.id = id;
         this.date = date;
         this.seller = seller;
         this.product = product;
         this.category = category;
         this.price = price;
+        this.hasPromo = hasPromo;
+        this.discount = discount;
     }
 
     public Integer getId() {
@@ -54,7 +65,7 @@ public class Post {
         this.date = date;
     }
 
-    public User getSeller() {
+    public Seller getSeller() {
         return seller;
     }
 
@@ -84,5 +95,21 @@ public class Post {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Boolean getHasPromo() {
+        return hasPromo;
+    }
+
+    public void setHasPromo(Boolean hasPromo) {
+        this.hasPromo = hasPromo;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
     }
 }

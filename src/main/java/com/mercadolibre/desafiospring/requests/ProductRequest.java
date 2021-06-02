@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 
 public class ProductRequest {
 
-    @NotBlank
+    @NotBlank(message = "Field cannot be null")
     private String productName;
     private String type;
     private String brand;

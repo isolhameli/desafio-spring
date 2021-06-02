@@ -4,8 +4,7 @@ import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
 import com.mercadolibre.desafiospring.requests.UserRequest;
 import com.mercadolibre.desafiospring.responses.users.FollowList;
-
-import java.util.List;
+import com.mercadolibre.desafiospring.responses.users.SellerFollowersCount;
 
 public interface UserService {
     User create(UserRequest userRequest);
@@ -16,7 +15,7 @@ public interface UserService {
 
     Seller getSeller(Integer userId);
 
-    Integer getFollowerCount(Integer userId);
+    SellerFollowersCount getFollowerCountResponse(Integer userId);
 
     User getUser(Integer userId);
 

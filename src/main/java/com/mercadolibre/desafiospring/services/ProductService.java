@@ -5,5 +5,5 @@ import com.mercadolibre.desafiospring.requests.PostRequest;
 import com.mercadolibre.desafiospring.requests.ProductRequest;
 
 public interface ProductService {
-    Product create(ProductRequest productRequest);
+    Product save(ProductRequest productRequest);
 }

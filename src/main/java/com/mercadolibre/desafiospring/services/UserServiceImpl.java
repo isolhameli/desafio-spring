@@ -8,8 +8,9 @@ import com.mercadolibre.desafiospring.repositories.UserRepository;
 import com.mercadolibre.desafiospring.requests.UserRequest;
 import com.mercadolibre.desafiospring.responses.users.FollowList;
 import com.mercadolibre.desafiospring.responses.users.FollowedList;
+import com.mercadolibre.desafiospring.responses.users.SellerFollowersCount;
 import com.mercadolibre.desafiospring.responses.users.UserResponse;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService{
         }
         else{
             user = new User(userRequest.getUserName(), LocalDate.now());
+        }
+        if (!(userRepository.findByUserName(userRequest.getUserName())==null)){
+            throw new UserAlreadyExistsException("Username already taken");
         }
         return userRepository.save(user);
     }
@@ -70,8 +74,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Integer getFollowerCount(Integer userId) {
-        return userRepository.countFollowers(userId);
+    public SellerFollowersCount getFollowerCountResponse(Integer userId) {
+        User user = getSeller(userId);
+        Integer followerCount = getFollowerCount(userId);
+        return new SellerFollowersCount(userId,user.getUserName(),followerCount);
+    }
+
+    private Integer getFollowerCount(Integer userId){
+        return userRepository.countByFollowingId(userId);
     }
 
     @Override
@@ -116,16 +126,14 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
     }
 
+    private Sort.Direction getSortDirection(String order){
+        return order.toLowerCase().equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+    }
+
     @Override
     public FollowedList getFollowers(Integer userId, String order) {
         Seller seller = getSeller(userId);
-        order = order.toLowerCase();
-        List<User> followers = new ArrayList<>();
-        if (order.equals("desc")){
-            followers = userRepository.findByFollowingIdOrderByUserNameDesc(userId);
-        } else if(order.equals("asc")){
-            followers = userRepository.findByFollowingIdOrderByUserNameAsc(userId);
-        }
+        List<User> followers = userRepository.findByFollowingId(userId, Sort.by(getSortDirection(order),"userName"));
         List<UserResponse> followersResponse = followers.stream().map(el -> UserResponse.fromModel(el))
                 .collect(Collectors.toList());
         return new FollowedList(userId,seller.getUserName(),followersResponse);
@@ -134,13 +142,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public FollowList getFollowed(Integer userId, String order) {
         User user = getUser(userId);
-        order = order.toLowerCase();
-        List<Seller> followed = new ArrayList<>();
-        if (order.equals("desc")){
-            followed = sellerRepository.findByFollowersIdOrderByUserNameDesc(userId);
-        } else if(order.equals("asc")){
-            followed = sellerRepository.findByFollowersIdOrderByUserNameAsc(userId);
-        }
+        List<Seller> followed = sellerRepository.findByFollowersId(userId, Sort.by(getSortDirection(order),"userName"));
         List<UserResponse> followedResponse = followed.stream().
                 map(el -> new UserResponse(el.getId(),el.getUserName()))
                 .collect(Collectors.toList());
