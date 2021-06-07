@@ -10,11 +10,11 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer> {
 
-    int countByFollowingId(Integer id);
+    int countByFollowedId(Integer id);
 
     boolean existsById(Integer id);
 
-    List<User> findByFollowingId(Integer id, Sort sort);
+    List<User> findByFollowedId(Integer id, Sort sort);
 
     User findByUserName(String userName);
 }

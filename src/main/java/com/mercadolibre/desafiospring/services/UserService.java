@@ -5,9 +5,10 @@ import com.mercadolibre.desafiospring.models.User;
 import com.mercadolibre.desafiospring.requests.UserRequest;
 import com.mercadolibre.desafiospring.responses.users.FollowList;
 import com.mercadolibre.desafiospring.responses.users.SellerFollowersCount;
+import com.mercadolibre.desafiospring.responses.users.UserCreateResponse;
 
 public interface UserService {
-    User create(UserRequest userRequest);
+    UserCreateResponse create(UserRequest userRequest);
 
     void follow(Integer userId, Integer userIdToFollow);
 

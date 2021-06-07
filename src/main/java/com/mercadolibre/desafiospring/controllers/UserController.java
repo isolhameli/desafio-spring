@@ -5,8 +5,8 @@ import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.requests.UserRequest;
 import com.mercadolibre.desafiospring.responses.users.FollowList;
 import com.mercadolibre.desafiospring.responses.users.SellerFollowersCount;
+import com.mercadolibre.desafiospring.responses.users.UserCreateResponse;
 import com.mercadolibre.desafiospring.services.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +22,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value="/create") // US 0001 (must create User before follow)
-    ResponseEntity create(@RequestBody @Valid UserRequest userRequest){
-        userService.create(userRequest);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping(value="/create") // US 0000 (must create User before following or posting)
+    ResponseEntity<UserCreateResponse> create(@RequestBody @Valid UserRequest userRequest){
+        return ResponseEntity.ok(userService.create(userRequest));
     }
 
     @PostMapping(value = "/{userId}/follow/{userIdToFollow}") // US 0001
@@ -43,13 +42,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/followers/list") // US 0003 and US 0008
-    ResponseEntity<FollowList> getFollowedList(@PathVariable Integer userId, @RequestParam(defaultValue = "asc") String order){
+    ResponseEntity<FollowList> getFollowedList(@PathVariable Integer userId, @RequestParam(defaultValue = "name_asc") String order){
         FollowList followList = userService.getFollowers(userId, order);
         return ResponseEntity.ok(followList);
     }
 
     @GetMapping(value = "/{userId}/followed/list") // US 0004 US 0008
-    ResponseEntity<FollowList> getFollowersList(@PathVariable Integer userId, @RequestParam(defaultValue = "asc") String order){
+    ResponseEntity<FollowList> getFollowersList(@PathVariable Integer userId, @RequestParam(defaultValue = "name_asc") String order){
         FollowList followList = userService.getFollowed(userId, order);
         return ResponseEntity.ok(followList);
     }

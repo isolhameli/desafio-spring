@@ -16,7 +16,7 @@ public class Seller extends User{
     private List<Post> postList;
 
 
-    @ManyToMany(mappedBy = "following")
+    @ManyToMany(mappedBy = "followed")
     private Set<User> followers;
 
 

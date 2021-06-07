@@ -1,15 +1,12 @@
 package com.mercadolibre.desafiospring.services;
 
-import com.mercadolibre.desafiospring.exceptions.user.*;
+import com.mercadolibre.desafiospring.exceptions.users.*;
 import com.mercadolibre.desafiospring.models.Seller;
 import com.mercadolibre.desafiospring.models.User;
 import com.mercadolibre.desafiospring.repositories.SellerRepository;
 import com.mercadolibre.desafiospring.repositories.UserRepository;
 import com.mercadolibre.desafiospring.requests.UserRequest;
-import com.mercadolibre.desafiospring.responses.users.FollowList;
-import com.mercadolibre.desafiospring.responses.users.FollowedList;
-import com.mercadolibre.desafiospring.responses.users.SellerFollowersCount;
-import com.mercadolibre.desafiospring.responses.users.UserResponse;
+import com.mercadolibre.desafiospring.responses.users.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +21,16 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final SellerRepository sellerRepository;
+    private final UtilService utilService;
 
-    public UserServiceImpl(UserRepository userRepository, SellerRepository sellerRepository) {
+    public UserServiceImpl(UserRepository userRepository, SellerRepository sellerRepository, UtilService utilService) {
         this.userRepository = userRepository;
         this.sellerRepository = sellerRepository;
+        this.utilService = utilService;
     }
 
     @Override
-    public User create(UserRequest userRequest) {
+    public UserCreateResponse create(UserRequest userRequest) {
         User user;
         if (userRequest.isSeller()){
             user = new Seller(userRequest.getUserName(), LocalDate.now());
@@ -42,7 +41,9 @@ public class UserServiceImpl implements UserService{
         if (!(userRepository.findByUserName(userRequest.getUserName())==null)){
             throw new UserAlreadyExistsException("Username already taken");
         }
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        UserCreateResponse userCreateResponse = new UserCreateResponse(user.getId(), user.getUserName(),userRequest.isSeller());
+        return userCreateResponse;
     }
 
     @Override
@@ -51,10 +52,10 @@ public class UserServiceImpl implements UserService{
         List<User> users = findAllById(Arrays.asList(userId,userIdToFollow));
         User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
         User userToFollow = users.stream().filter(el -> el.getId() == userIdToFollow).findFirst().get();
-        if (user.getFollowing().contains(userToFollow)){
+        if (user.getFollowed().contains(userToFollow)){
             throw new UserAlreadyFollowsSellerException("User already followers Seller");
         }
-        user.getFollowing().add((Seller) userToFollow);
+        user.getFollowed().add((Seller) userToFollow);
         update(user);
 
     }
@@ -81,7 +82,7 @@ public class UserServiceImpl implements UserService{
     }
 
     private Integer getFollowerCount(Integer userId){
-        return userRepository.countByFollowingId(userId);
+        return userRepository.countByFollowedId(userId);
     }
 
     @Override
@@ -120,20 +121,16 @@ public class UserServiceImpl implements UserService{
         List<User> users = findAllById(Arrays.asList(userId, userIdToUnfollow));
         User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
         Seller userToUnfollow = (Seller) users.stream().filter(el -> el.getId() == userIdToUnfollow).findFirst().get();
-        if (!user.removeFollowing(userToUnfollow)){
+        if (!user.removeFollowed(userToUnfollow)){
             throw new UserDoesNotFollowSellerException("User does not follow seller");
         };
         userRepository.save(user);
     }
 
-    private Sort.Direction getSortDirection(String order){
-        return order.toLowerCase().equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-    }
-
     @Override
     public FollowedList getFollowers(Integer userId, String order) {
         Seller seller = getSeller(userId);
-        List<User> followers = userRepository.findByFollowingId(userId, Sort.by(getSortDirection(order),"userName"));
+        List<User> followers = userRepository.findByFollowedId(userId, utilService.getSort(order, UserResponse.class, "userName"));
         List<UserResponse> followersResponse = followers.stream().map(el -> UserResponse.fromModel(el))
                 .collect(Collectors.toList());
         return new FollowedList(userId,seller.getUserName(),followersResponse);
@@ -142,7 +139,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public FollowList getFollowed(Integer userId, String order) {
         User user = getUser(userId);
-        List<Seller> followed = sellerRepository.findByFollowersId(userId, Sort.by(getSortDirection(order),"userName"));
+        List<Seller> followed = sellerRepository.findByFollowersId(userId, utilService.getSort(order, UserResponse.class, "userName"));
         List<UserResponse> followedResponse = followed.stream().
                 map(el -> new UserResponse(el.getId(),el.getUserName()))
                 .collect(Collectors.toList());

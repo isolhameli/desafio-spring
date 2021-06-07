@@ -1,15 +1,17 @@
 package com.mercadolibre.desafiospring.requests;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class UserRequest {
 
-    @NotBlank(message = "Preenchimento obrigatório")
-    @Size(min=5,max=20,message = "Nome de usuário deve ter entre 5 e 20 caracteres")
+    @NotNull(message = "Field cannot be null")
+    @Size(min=5,max=20,message = "userName must be between 5 and 20 characters")
     private String userName;
-    private boolean seller;
+    @NotNull(message = "Field cannot be null")
+    private Boolean seller;
 
     public UserRequest() {
     }

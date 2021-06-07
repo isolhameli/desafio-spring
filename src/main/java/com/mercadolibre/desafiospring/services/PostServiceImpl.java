@@ -1,7 +1,7 @@
 package com.mercadolibre.desafiospring.services;
 
 import com.mercadolibre.desafiospring.exceptions.products.PostMustHavePromotionException;
-import com.mercadolibre.desafiospring.exceptions.user.UserNotFoundException;
+import com.mercadolibre.desafiospring.exceptions.users.UserNotFoundException;
 import com.mercadolibre.desafiospring.models.Post;
 import com.mercadolibre.desafiospring.models.Product;
 import com.mercadolibre.desafiospring.models.Seller;
@@ -9,9 +9,10 @@ import com.mercadolibre.desafiospring.repositories.PostRepository;
 import com.mercadolibre.desafiospring.repositories.ProductRepository;
 import com.mercadolibre.desafiospring.requests.PostRequest;
 import com.mercadolibre.desafiospring.requests.PromotionalPostRequest;
-import com.mercadolibre.desafiospring.responses.posts.FollowedPostsResponse;
-import com.mercadolibre.desafiospring.responses.posts.PostResponse;
-import com.mercadolibre.desafiospring.responses.posts.PromotionalPostResponse;
+import com.mercadolibre.desafiospring.responses.products.FollowedPostsResponse;
+import com.mercadolibre.desafiospring.responses.products.PostResponse;
+import com.mercadolibre.desafiospring.responses.products.PromotionalPostCountResponse;
+import com.mercadolibre.desafiospring.responses.products.PromotionalPostListResponse;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +29,15 @@ public class PostServiceImpl implements PostService{
     private final UserService userService;
     private final PostRepository postRepository;
     private final ProductService productService;
+    private final UtilService utilService;
 
-    public PostServiceImpl(UserService userService, PostRepository postRepository, ProductService productService,
-                           ProductRepository productRepository) {
+    public PostServiceImpl(ProductRepository productRepository, UserService userService, PostRepository postRepository,
+                           ProductService productService, UtilService utilService) {
+        this.productRepository = productRepository;
         this.userService = userService;
         this.postRepository = postRepository;
         this.productService = productService;
-        this.productRepository = productRepository;
+        this.utilService = utilService;
     }
 
     @Override
@@ -57,11 +60,8 @@ public class PostServiceImpl implements PostService{
         }
         LocalDate today = LocalDate.now();
         LocalDate twoWeeksAgo = LocalDate.now().minusDays(14);
-        if (order.toLowerCase().strip().equals("desc")){
-            return postRepository.findBySellerFollowersIdAndDateBetween(userId,twoWeeksAgo, today, Sort.by("date").descending());
-        }
-        return postRepository.findBySellerFollowersIdAndDateBetween(userId,twoWeeksAgo, today,Sort.by("date").ascending());
-
+        return postRepository.findBySellerFollowersIdAndDateBetween(userId,twoWeeksAgo, today,
+                utilService.getSort(order,PostResponse.class, "date"));
     }
 
     public FollowedPostsResponse getFollowedPostsLast14DaysResponse(Integer userId, String order){
@@ -74,11 +74,33 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public PromotionalPostResponse createPromotional(PromotionalPostRequest postRequest) {
-        Post post = save(postRequest);
+    public PostResponse createPromotional(PromotionalPostRequest postRequest) {
         if (!postRequest.getHasPromo()){
             throw new PostMustHavePromotionException("Posts created through this endpoint must have a promotion");
         }
-        return new PromotionalPostResponse(post);
+        Post post = save(postRequest);
+        return new PostResponse(post);
+    }
+
+    @Override
+    public PromotionalPostCountResponse getPromotionalPostCount(Integer userId) {
+        Seller user = userService.getSeller(userId);
+        Integer promotionalPostCount = postRepository.countBySellerIdAndHasPromo(userId,true);
+        return new PromotionalPostCountResponse(userId, user.getUserName(),promotionalPostCount);
+    }
+
+    @Override
+    public PromotionalPostListResponse getPromotionalPostList(Integer userId) {
+        Seller user = userService.getSeller(userId);
+        List<PostResponse> postList= postRepository.
+                findBySellerIdAndHasPromo(userId,true)
+                .stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+        return new PromotionalPostListResponse(userId, user.getUserName(),postList);
+    }
+
+    private Sort.Direction getSortDirection(String order){
+        return order.toLowerCase().equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
     }
 }

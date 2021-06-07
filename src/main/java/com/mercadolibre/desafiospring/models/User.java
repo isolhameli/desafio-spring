@@ -23,12 +23,12 @@ public class User {
 
     @ManyToMany
     @JoinTable(name="FOLLOWERS",joinColumns = @JoinColumn(name="USER_ID"),inverseJoinColumns = @JoinColumn(name="SELLER_ID"))
-    private Set<Seller> following;
+    private Set<Seller> followed;
 
     public User(String userName, LocalDate joinDate) {
         this.userName = userName;
         this.joinDate = joinDate;
-        this.following = new HashSet<Seller>();
+        this.followed = new HashSet<Seller>();
 
     }
 
@@ -60,16 +60,16 @@ public class User {
         this.joinDate = joinDate;
     }
 
-    public Set<Seller> getFollowing() {
-        return following;
+    public Set<Seller> getFollowed() {
+        return followed;
     }
 
-    public void setFollowing(Set<Seller> followingList) {
-        this.following = followingList;
+    public void setFollowed(Set<Seller> followingList) {
+        this.followed = followed;
     }
 
-    public boolean removeFollowing(Seller seller){
-        boolean result = this.getFollowing().remove(seller);
+    public boolean removeFollowed(Seller seller){
+        boolean result = this.followed.remove(seller);
         seller.getFollowers().remove(this);
         return result;
     }

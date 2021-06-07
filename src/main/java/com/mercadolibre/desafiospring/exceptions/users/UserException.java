@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.exceptions.user;
+package com.mercadolibre.desafiospring.exceptions.users;
 
 import com.mercadolibre.desafiospring.exceptions.EntityException;
 

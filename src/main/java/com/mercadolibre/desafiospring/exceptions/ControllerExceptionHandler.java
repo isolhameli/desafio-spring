@@ -1,6 +1,5 @@
 package com.mercadolibre.desafiospring.exceptions;
 
-import com.mercadolibre.desafiospring.exceptions.user.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

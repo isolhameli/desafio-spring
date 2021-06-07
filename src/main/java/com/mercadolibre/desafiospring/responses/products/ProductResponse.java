@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.responses.posts;
+package com.mercadolibre.desafiospring.responses.products;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,6 +13,7 @@ public class ProductResponse {
     private String brand;
     private String color;
     private String notes;
+
 
     public ProductResponse() {
     }
@@ -50,5 +51,6 @@ public class ProductResponse {
     public String getNotes() {
         return notes;
     }
+
 
 }

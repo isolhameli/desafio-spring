@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.responses.posts;
+package com.mercadolibre.desafiospring.responses.products;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,6 +19,10 @@ public class PostResponse {
     private ProductResponse detail;
     private Integer category;
     private Double price;
+    @JsonView({PostView.PromotionalDetailed.class,PostView.PromotionalSimple.class})
+    private Boolean hasPromo;
+    @JsonView({PostView.PromotionalDetailed.class,PostView.PromotionalSimple.class})
+    private Double discount;
 
     public PostResponse() {
     }
@@ -30,6 +34,8 @@ public class PostResponse {
         this.detail = new ProductResponse(post.getProduct());
         this.category = post.getCategory();
         this.price = post.getPrice();
+        this.hasPromo = post.getHasPromo();
+        this.discount = post.getDiscount();
     }
 
     @JsonProperty("id_post")
@@ -80,5 +86,21 @@ public class PostResponse {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Boolean getHasPromo() {
+        return hasPromo;
+    }
+
+    public void setHasPromo(Boolean hasPromo) {
+        this.hasPromo = hasPromo;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
     }
 }

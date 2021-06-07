@@ -1,6 +1,4 @@
-package com.mercadolibre.desafiospring.responses.posts;
-
-import com.mercadolibre.desafiospring.models.Post;
+package com.mercadolibre.desafiospring.responses.products;
 
 import java.util.List;
 

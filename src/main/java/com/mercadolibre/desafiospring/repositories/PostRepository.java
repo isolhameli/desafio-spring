@@ -12,4 +12,8 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post,Integer> {
 
     List<Post> findBySellerFollowersIdAndDateBetween(Integer sellerId, LocalDate twoWeeksAgo, LocalDate today, Sort sort);
+
+    Integer countBySellerIdAndHasPromo(Integer sellerId, Boolean hasPromo);
+
+    List<Post> findBySellerIdAndHasPromo(Integer sellerId, Boolean hasPromo);
 }

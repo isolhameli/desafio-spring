@@ -2,9 +2,10 @@ package com.mercadolibre.desafiospring.services;
 
 import com.mercadolibre.desafiospring.requests.PostRequest;
 import com.mercadolibre.desafiospring.requests.PromotionalPostRequest;
-import com.mercadolibre.desafiospring.responses.posts.FollowedPostsResponse;
-import com.mercadolibre.desafiospring.responses.posts.PostResponse;
-import com.mercadolibre.desafiospring.responses.posts.PromotionalPostResponse;
+import com.mercadolibre.desafiospring.responses.products.FollowedPostsResponse;
+import com.mercadolibre.desafiospring.responses.products.PostResponse;
+import com.mercadolibre.desafiospring.responses.products.PromotionalPostCountResponse;
+import com.mercadolibre.desafiospring.responses.products.PromotionalPostListResponse;
 
 public interface PostService {
 
@@ -13,5 +14,9 @@ public interface PostService {
 
     FollowedPostsResponse getFollowedPostsLast14DaysResponse(Integer userId, String order);
 
-    PromotionalPostResponse createPromotional(PromotionalPostRequest postRequest);
+    PostResponse createPromotional(PromotionalPostRequest postRequest);
+
+    PromotionalPostCountResponse getPromotionalPostCount(Integer userId);
+
+    PromotionalPostListResponse getPromotionalPostList(Integer userId);
 }
