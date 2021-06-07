@@ -7,11 +7,13 @@ public class StandardError {
     private Integer status;
     private String message;
     private Long timeStamp;
+    private String path;
 
-    public StandardError(Integer status, String message, Long timeStamp) {
+    public StandardError(Integer status, String message, Long timeStamp, String path) {
         this.status = status;
         this.message = message;
         this.timeStamp = timeStamp;
+        this.path = path;
     }
 
     public Integer getStatus() {
@@ -36,5 +38,13 @@ public class StandardError {
 
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

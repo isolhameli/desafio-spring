@@ -1,4 +1,4 @@
-package com.mercadolibre.desafiospring.exceptions;
+package com.mercadolibre.desafiospring.exceptions.util;
 
 import java.io.Serializable;
 

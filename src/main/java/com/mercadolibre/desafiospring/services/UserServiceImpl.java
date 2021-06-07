@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void follow(Integer userId, Integer userIdToFollow) {
-        checkAndHandleSameUser(userId, userIdToFollow);
+        checkAndHandleSameUser(userId, userIdToFollow, "follow");
         List<User> users = findAllById(Arrays.asList(userId,userIdToFollow));
         User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
         User userToFollow = users.stream().filter(el -> el.getId() == userIdToFollow).findFirst().get();
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void unfollow(Integer userId, Integer userIdToUnfollow) {
-        checkAndHandleSameUser(userId, userIdToUnfollow);
+        checkAndHandleSameUser(userId, userIdToUnfollow, "unfollow");
         List<User> users = findAllById(Arrays.asList(userId, userIdToUnfollow));
         User user = users.stream().filter(el -> el.getId() == userId).findFirst().get();
         Seller userToUnfollow = (Seller) users.stream().filter(el -> el.getId() == userIdToUnfollow).findFirst().get();
@@ -147,12 +147,12 @@ public class UserServiceImpl implements UserService{
         return followList;
     }
 
-    private void checkAndHandleSameUser(Integer firstUser, Integer secondUser){
+    private void checkAndHandleSameUser(Integer firstUser, Integer secondUser, String action){
         if (firstUser == secondUser){
             if (!userRepository.existsById(firstUser)){
                 throw new UserNotFoundException("User not found. ID: "+firstUser);
             }
-            throw new UserCycliclReferenceException("User cannot unfollow themself");
+            throw new UserCycliclReferenceException("User cannot " + action+ " themself");
         }
 
 

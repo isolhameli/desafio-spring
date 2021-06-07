@@ -13,6 +13,9 @@ import com.mercadolibre.desafiospring.services.ProductService;
 import com.mercadolibre.desafiospring.views.PostView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +34,11 @@ public class ProductController {
         this.postService = postService;
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Seller not found")})
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "US 0005 - Register a new non promotional Post for a given Seller")
     @PostMapping(value="/newpost") // US 0005
     @JsonView(PostView.Detailed.class)
@@ -39,6 +47,11 @@ public class ProductController {
         return ResponseEntity.ok(post);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Seller not found")})
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "US 0010 - Register a new promotional Post for a given Seller")
     @PostMapping(value="/newpromopost") // US 0010
     @JsonView(PostView.PromotionalDetailed.class)
@@ -47,14 +60,24 @@ public class ProductController {
         return ResponseEntity.ok(post);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Client not found")})
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "US 0006 and US 0009 - List all Posts by Sellers followed by a Client (userId) posted in the last 14 days")
     @GetMapping(value="/followed/{userId}/list") // US 0006 and US 0009
     @JsonView(PostView.Simple.class)
-    ResponseEntity<FollowedPostsResponse> followedProducts(@PathVariable Integer userId, @RequestParam(defaultValue = "desc") String order){
+    ResponseEntity<FollowedPostsResponse> followedProducts(@PathVariable Integer userId, @RequestParam(defaultValue = "date_desc") String order){
         FollowedPostsResponse postResponseList = postService.getFollowedPostsLast14DaysResponse(userId, order);
         return ResponseEntity.ok(postResponseList);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Seller not found")})
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "US 0011 - Count all Promotional Posts by a Seller")
     @GetMapping(value = "/{userId}/countPromo") // US 0011
     ResponseEntity<PromotionalPostCountResponse> promotionalPostCount(@PathVariable Integer userId){
@@ -62,6 +85,11 @@ public class ProductController {
         return ResponseEntity.ok(promotionalPostCount);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Seller not found")})
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "US 0012 - Lists all Promotional Posts by a Seller")
     @GetMapping(value = "/{userId}/list") // US 0012
     @JsonView(PostView.PromotionalSimple.class)

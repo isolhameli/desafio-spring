@@ -25,7 +25,8 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("com.mercadolibre.desafiospring.controllers"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(metaData());
+                .apiInfo(metaData())
+                .useDefaultResponseMessages(false);
     }
 
     private ApiInfo metaData() {
