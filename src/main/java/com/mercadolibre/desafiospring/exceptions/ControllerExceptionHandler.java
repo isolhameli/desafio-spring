@@ -43,11 +43,10 @@ public class ControllerExceptionHandler {
     }
 
     private ResponseEntity<StandardError> invalidField(JsonMappingException e, HttpServletRequest httpServletRequest){
-        String errorMessage;
         String invalidProperty = e.getPath().get(0).getFieldName();
         String valueProvided = ((InvalidFormatException) e).getValue().toString();
         String targetType = ((InvalidFormatException) e).getTargetType().getSimpleName();
-        errorMessage = "Value of " + invalidProperty + ": " + valueProvided + " cannot be cast to " + targetType;
+        String errorMessage = "Value of " + invalidProperty + ": " + valueProvided + " cannot be cast to " + targetType;
         StandardError err = new StandardError(HttpStatus.BAD_REQUEST.value(),errorMessage ,
                 System.currentTimeMillis(), httpServletRequest.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
